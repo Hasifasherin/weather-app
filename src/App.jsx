@@ -3,14 +3,11 @@ import { useState } from "react";
 function App() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
-  const apiKey = "YOUR_OPENWEATHER_API_KEY"; // replace with your key
 
   const getWeather = async () => {
     if (!city) return;
     try {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
-      );
+      const response = await fetch(`https://wttr.in/${city}?format=j1`);
       const data = await response.json();
       setWeather(data);
     } catch (error) {
@@ -20,7 +17,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600 flex flex-col items-center justify-center p-6 text-white">
-      <h1 className="text-3xl font-bold mb-6">🌤 Weather App</h1>
+      <h1 className="text-3xl font-bold mb-6">🌤 Free Weather Forecast</h1>
 
       <div className="flex space-x-2 mb-6">
         <input
@@ -38,12 +35,31 @@ function App() {
         </button>
       </div>
 
-      {weather && weather.main && (
+      {weather && (
         <div className="bg-white/20 p-6 rounded-2xl shadow-lg text-center">
-          <h2 className="text-2xl font-bold">{weather.name}</h2>
-          <p className="text-xl capitalize">{weather.weather[0].description}</p>
-          <p className="text-3xl font-semibold">{weather.main.temp}°C</p>
-          <p>Humidity: {weather.main.humidity}%</p>
+          <h2 className="text-2xl font-bold">{city}</h2>
+          <p className="text-xl">
+            {weather.current_condition[0].weatherDesc[0].value}
+          </p>
+          <p className="text-3xl font-semibold">
+            {weather.current_condition[0].temp_C}°C
+          </p>
+          <p>Humidity: {weather.current_condition[0].humidity}%</p>
+        </div>
+      )}
+
+      {weather && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          {weather.weather.slice(0, 3).map((day, index) => (
+            <div
+              key={index}
+              className="bg-white/20 p-4 rounded-xl text-center shadow"
+            >
+              <p className="font-bold">Day {index + 1}</p>
+              <p className="capitalize">{day.hourly[4].weatherDesc[0].value}</p>
+              <p className="text-xl">{day.avgtempC}°C</p>
+            </div>
+          ))}
         </div>
       )}
     </div>
